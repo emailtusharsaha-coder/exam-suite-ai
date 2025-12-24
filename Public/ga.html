@@ -140,7 +140,15 @@
             <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-solid);"></i>
             <div id="loading-text" style="margin-top: 10px; font-weight: bold; color: #555;">Thinking...</div>
         </div>
-        <div id="output-section" class="output-section"></div>
+        <div id="output-section" class="output-section" style="display:none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+        <h2 style="margin: 0; color: #ea580c;">Analysis Result:</h2>
+        <button onclick="saveToHistory()" style="background: #ea580c; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+            <i class="fas fa-save"></i> Save
+        </button>
+    </div>
+    <div id="ga-content"></div>
+</div>
     </div>
 
     <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
@@ -185,9 +193,29 @@
                 const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'auth-token': token }, body: JSON.stringify(body) });
                 const data = await res.json();
                 if(data.error) throw new Error(data.error);
-                outputBox.innerText = data.reply; outputBox.style.display = 'block';
+                document.getElementById('ga-content').innerText = data.reply; outputBox.style.display = 'block';
             } catch (err) { alert("Error: " + err.message); } finally { loadingBox.style.display = 'none'; }
         }
+async function saveToHistory() {
+    const content = document.getElementById('ga-content').innerText;
+    if (!content) return alert("Nothing to save yet!");
+    const token = localStorage.getItem('token');
+    
+    // GA has multiple types, so we make a generic title
+    let title = "GA Analysis";
+    if (content.includes("Quiz")) title = "GA Quiz";
+    else if (content.includes("Concept")) title = "Concept Explanation";
+
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ tool: 'General Awareness', title: title, content: content })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
