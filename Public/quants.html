@@ -86,6 +86,29 @@
                 responseText.innerText = data.reply; outputSection.style.display = "block"; outputSection.scrollIntoView({ behavior: 'smooth' });
             } catch (error) { alert("Error: " + error.message); } finally { loadingBox.style.display = "none"; btn.disabled = false; }
         }
+        async function saveToHistory() {
+    const content = document.getElementById('ai-response').innerText;
+    if (!content) return alert("Nothing to save yet!");
+
+    const token = localStorage.getItem('token');
+    // Use the first 30 chars as title, or "Math Question"
+    const title = content.substring(0, 30).split('\n')[0] + "..."; 
+
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ 
+                tool: 'Quants', 
+                title: title, 
+                content: content 
+            })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+        else alert("Save failed.");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
