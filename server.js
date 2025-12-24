@@ -2,38 +2,46 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const path = require('path'); // <--- CRITICAL IMPORT
+const path = require('path');
+const fs = require('fs');
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// MIDDLEWARE
 app.use(express.json());
 app.use(cors());
 
-// SERVE STATIC FILES (CSS, HTML, JS)
-// This tells the server to look in the 'public' folder for files
-app.use(express.static(path.join(__dirname, 'public')));
+// --- THE FIX: USE 'Public' (Capital P) TO MATCH YOUR FOLDER ---
+const publicPath = path.join(__dirname, 'Public'); 
+console.log("📂 Server is looking for files in:", publicPath);
+
+if (fs.existsSync(publicPath)) {
+    console.log("✅ Public folder found!");
+} else {
+    console.log("❌ Public folder MISSING at path:", publicPath);
+}
+
+// Serve static files from 'Public'
+app.use(express.static(publicPath));
 
 // CONNECT TO DB
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("✅ Database Connected (MongoDB Atlas)"))
+    .then(() => console.log("✅ Database Connected"))
     .catch(err => console.error("❌ DB Connection Error:", err));
 
-// IMPORT ROUTES
+// ROUTES
 const authRoutes = require('./routes/auth');
-const quantRoutes = require('./routes/quants');
+const adminRoutes = require('./routes/admin');
+const quantRoutes = require('./routes/quants'); // Ensure filename is quants.js (lowercase)
 const englishRoutes = require('./routes/english');
 const reasoningRoutes = require('./routes/reasoning');
-const gaRoutes = require('./routes/ga'); // Ensure this file exists
+const gaRoutes = require('./routes/ga');
 const notesRoutes = require('./routes/notes');
-const blogRoutes = require('./routes/blog'); // Ensure this file exists
-const descriptiveRoutes = require('./routes/descriptive'); // Ensure this file exists
-const adminRoutes = require('./routes/admin');
+const blogRoutes = require('./routes/blog');
+const descriptiveRoutes = require('./routes/addDescriptive'); // Ensure filename matches
 
-// USE ROUTES
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/generate-quants', quantRoutes);
@@ -44,13 +52,16 @@ app.use('/generate-notes', notesRoutes);
 app.use('/generate-blog', blogRoutes);
 app.use('/generate-descriptive', descriptiveRoutes);
 
-// --- THE FIX: HANDLE HOMEPAGE & REFRESHES ---
-// This forces the server to serve 'index.html' when you visit the main URL
+// FORCE HOMEPAGE
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    const indexPath = path.join(publicPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send(`Error: index.html not found in ${publicPath}`);
+    }
 });
 
-// START SERVER
 app.listen(PORT, () => {
-    console.log(`✅ Modular Server running at http://localhost:${PORT}`);
+    console.log(`✅ Server running on port ${PORT}`);
 });
