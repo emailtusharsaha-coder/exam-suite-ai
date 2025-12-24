@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Suite - Exam Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            /* NEW GRADIENT THEME */
+            --primary-gradient: linear-gradient(135deg, #fb7185 0%, #e11d48 100%); 
+            --primary-solid: #e11d48;
+            --accent-color: #fda4af; 
+            --light-bg: #fff1f2; 
+            --white: #ffffff; 
+            --text-dark: #333333; 
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--light-bg); color: var(--text-dark); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .header-container { 
+            background: var(--primary-gradient); /* Gradient Background */
+            color: var(--white); padding: 35px; text-align: center; position: relative; 
+            display: flex; flex-direction: column; align-items: center; 
+            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3);
+        }
+        .back-link { position: absolute; top: 25px; left: 25px; color: white; text-decoration: none; font-weight: bold; opacity: 0.9; }
+        
+        /* REPLACED IMAGE WITH ICON */
+        .tool-icon {
+            width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: white;
+            margin-bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .container { width: 100%; max-width: 900px; background: var(--white); padding: 45px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 40px auto; }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--primary-solid); font-size: 1.1rem; }
+        textarea, select { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; box-sizing: border-box; font-family: inherit; resize: vertical; }
+        textarea:focus, select:focus { border-color: var(--primary-solid); outline: none; }
+        
+        .generate-btn { 
+            width: 100%; padding: 18px; 
+            background: var(--primary-gradient); /* Gradient Button */
+            color: var(--white); border: none; border-radius: 10px; 
+            font-size: 1.3rem; font-weight: bold; cursor: pointer; 
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 12px; 
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.2);
+        }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(225, 29, 72, 0.3); }
+        .generate-btn:disabled { background: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .loading-box { display: none; text-align: center; padding: 40px; margin-top: 30px; background: #fff0f3; border-radius: 12px; border: 2px dashed var(--accent-color); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #e0e0e0; border-top: 5px solid var(--primary-solid); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .output-section { margin-top: 40px; border-top: 2px solid #f0f0f0; padding-top: 30px; display: none; }
+        .output-box { background-color: #fff8f9; padding: 30px; border-left: 6px solid var(--primary-solid); border-radius: 8px; white-space: pre-wrap; font-size: 1.05rem; line-height: 1.7; }
+        
+        .footer { background: var(--text-dark); color: var(--white); text-align: center; padding: 25px; margin-top: auto; }
+
+        /* --- MOBILE PATCH --- */
+        @media (max-width: 768px) {
+            .container { width: 95%; padding: 20px; margin: 20px auto; }
+            h1 { font-size: 1.8rem; }
+            .header-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Home</a>
+        <div class="tool-icon"><i class="fas fa-spell-check"></i></div>
+        <h1>English Grammar Generator</h1>
+    </header>
+    <main class="main-content">
+        <div class="container">
+            <div class="input-group">
+                <label for="sample-q"><i class="fas fa-quote-left"></i> 1. Paste Sample Question/Sentence:</label>
+                <textarea id="sample-q" placeholder="e.g. He is superior than me. (Error Detection)"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="sample-sol"><i class="fas fa-book"></i> 2. Paste Logic/Rule:</label>
+                <textarea id="sample-sol" placeholder="e.g. Superior is followed by 'to', not 'than'."></textarea>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-robot"></i> Choose AI Model:</label>
+                <select id="ai-provider"><option value="gemini">Google Gemini (Default)</option><option value="groq">Llama 3 via Groq (Fast)</option></select>
+            </div>
+            <button id="generate-btn" class="generate-btn" onclick="generateEnglish()"><i class="fas fa-pen-fancy"></i> Generate Question</button>
+            <div id="loading-box" class="loading-box"><div class="spinner"></div><div>📖 Checking grammar...</div></div>
+            <div id="output-section" class="output-section">
+                <div class="output-header"><h2>Generated Question:</h2></div>
+                <div id="ai-response" class="output-box"></div>
+            </div>
+        </div>
+    </main>
+    <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
+    <script>
+        async function generateEnglish() {
+            const question = document.getElementById('sample-q').value;
+            const solution = document.getElementById('sample-sol').value;
+            const provider = document.getElementById('ai-provider').value;
+            const btn = document.getElementById('generate-btn');
+            const loadingBox = document.getElementById('loading-box');
+            const outputSection = document.getElementById('output-section');
+            const responseText = document.getElementById('ai-response');
+            const token = localStorage.getItem('token');
+            if (!token) { alert("Please login first!"); window.location.href = 'login.html'; return; }
+            if (!question || !solution) { alert("Please provide sample question and logic."); return; }
+            btn.disabled = true; loadingBox.style.display = "block"; outputSection.style.display = "none";
+            try {
+                const response = await fetch('/generate-english', { method: 'POST', headers: { 'Content-Type': 'application/json', 'auth-token': token }, body: JSON.stringify({ sampleQuestion: question, sampleSolution: solution, provider: provider }) });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                responseText.innerText = data.reply; outputSection.style.display = "block"; outputSection.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) { alert("Error: " + error.message); } finally { loadingBox.style.display = "none"; btn.disabled = false; }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Exam Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0056b3;
+            --secondary-orange: #ff6b35;
+            --light-bg: #f4f7f6;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-blue), #003d80);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .auth-card {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-area {
+            margin-bottom: 30px;
+        }
+        .logo-area i {
+            font-size: 3rem;
+            color: var(--secondary-orange);
+            background: #fff0e6;
+            padding: 20px;
+            border-radius: 50%;
+        }
+
+        h2 { margin: 10px 0 5px; color: var(--primary-blue); }
+        p { color: #666; margin-bottom: 25px; font-size: 0.9rem; }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: var(--secondary-orange);
+            outline: none;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .auth-btn:hover { background-color: #004494; }
+
+        .toggle-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .toggle-link {
+            color: var(--secondary-orange);
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .toggle-link:hover { text-decoration: underline; }
+
+        /* Hidden Utility */
+        .hidden { display: none; }
+        .error-msg {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div class="logo-area">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+
+        <div id="login-form">
+            <h2>Welcome Back</h2>
+            <p>Login to access your Exam Tools</p>
+            
+            <div id="login-error" class="error-msg"></div>
+
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="login-email" placeholder="student@example.com">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="login-pass" placeholder="Enter your password">
+            </div>
+
+            <button class="auth-btn" onclick="handleLogin()">Sign In</button>
+
+            <div class="toggle-text">
+                New here? <a class="toggle-link" onclick="toggleForms()">Create an Account</a>
+            </div>
+        </div>
+
+        <div id="signup-form" class="hidden">
+            <h2>Create Account</h2>
+            <p>Join the best Exam Prep Platform</p>
+
+            <div id="signup-error" class="error-msg"></div>
+
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" id="signup-name" placeholder="Tushar Saha">
+            </div>
+            <div class="input-group">
+                <label>Email Address</label>
+                <input type="email" id="signup-email" placeholder="student@example.com">
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="signup-pass" placeholder="Create a strong password">
+            </div>
+
+            <button class="auth-btn" onclick="handleSignup()">Sign Up</button>
+
+            <div class="toggle-text">
+                Already have an account? <a class="toggle-link" onclick="toggleForms()">Login here</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // TOGGLE LOGIC
+        function toggleForms() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            loginForm.classList.toggle('hidden');
+            signupForm.classList.toggle('hidden');
+            // Clear errors
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('signup-error').style.display = 'none';
+        }
+
+        // 1. HANDLE LOGIN
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-pass').value;
+            const errorBox = document.getElementById('login-error');
+
+            if (!email || !password) {
+                showError(errorBox, "Please fill in all fields.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(errorBox, data.error || "Login failed");
+                } else {
+                    // SUCCESS: Save Token & Redirect
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                showError(errorBox, "Server error. Please try again.");
+            }
+        }
+
+        // 2. HANDLE SIGNUP
+        async function handleSignup() {
+            const username = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-pass').value;
+            const errorBox = document.getElementById('signup-error');
+
+            if (!username || !email || !password) {
+                showError(errorBox, "All fields are required.");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    showError(errorBox, data.error || "Signup failed");
+                } else {
+                    alert("Account created! Please login.");
+                    toggleForms(); // Switch back to login view
+                }
+            } catch (err) {
+                showError(errorBox, "Server error. Please try again.");
+            }
+        }
+
+        function showError(element, message) {
+            element.innerText = message;
+            element.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

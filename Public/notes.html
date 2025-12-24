@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Study Notes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        :root {
+            /* TEAL GRADIENT THEME */
+            --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --primary-solid: #059669;
+            --secondary-color: #34d399;
+            --word-blue: #2b579a;
+            --light-bg: #ecfdf5;
+            --white: #ffffff;
+            --text-dark: #333333;
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--light-bg); color: var(--text-dark); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .header-container {
+            background: var(--primary-gradient);
+            color: var(--white); padding: 35px; text-align: center; position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .back-link { position: absolute; top: 25px; left: 25px; color: white; text-decoration: none; font-weight: bold; opacity: 0.9; }
+        
+        /* NEW ICON */
+        .tool-icon {
+            width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: white;
+            margin-bottom: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .container { width: 100%; max-width: 900px; background: var(--white); padding: 40px; margin: 40px auto; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--primary-solid); font-size: 1.1rem; }
+        input, select { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; box-sizing: border-box; background: white; }
+        input:focus, select:focus { border-color: var(--primary-solid); outline: none; }
+        
+        .btn-group { display: flex; gap: 15px; margin-top: 20px; }
+        
+        .generate-btn {
+            flex: 1; padding: 18px; 
+            background: var(--primary-gradient);
+            color: var(--white); border: none; border-radius: 10px; 
+            font-size: 1.2rem; font-weight: bold; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
+        .generate-btn:disabled { background: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .word-btn { background: var(--word-blue); flex: 0.4; }
+        .word-btn:hover { background: #1e3f72; }
+        
+        .output-section { display: none; margin-top: 30px; background: #f0fdf9; padding: 40px; border-left: 6px solid var(--primary-solid); border-radius: 8px; white-space: pre-wrap; line-height: 1.7; color: #2d3436; }
+        .loading-box { display: none; text-align: center; padding: 40px; margin-top: 30px; background: #fafffd; border: 2px dashed var(--primary-solid); border-radius: 12px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #ddd; border-top: 4px solid var(--primary-solid); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .footer { background: #1e293b; color: var(--white); text-align: center; padding: 25px; margin-top: auto; }
+
+        /* --- MOBILE PATCH --- */
+        @media (max-width: 768px) {
+            .container { padding: 20px; width: 95%; margin: 20px auto; }
+            div[style*="display: flex"] { flex-wrap: wrap; }
+            .input-group { min-width: 100%; }
+            .btn-group { flex-direction: column; }
+            h1 { font-size: 1.5rem; }
+            .header-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Home</a>
+        <div class="tool-icon"><i class="fas fa-book-reader"></i></div>
+        <h1>Smart Notes Generator</h1>
+    </header>
+    <div class="container">
+        <div class="input-group">
+            <label><i class="fas fa-book"></i> Enter Topic:</label>
+            <input type="text" id="topic-input" placeholder="e.g. Photosynthesis, Battle of Plassey...">
+        </div>
+        <div style="display: flex; gap: 20px;">
+            <div class="input-group" style="flex: 1;">
+                <label><i class="fas fa-layer-group"></i> Subject:</label>
+                <select id="subject-input">
+                    <option value="General">General Knowledge</option><option value="History">History</option><option value="Science">Science</option><option value="Economics">Economics</option><option value="Polity">Polity</option>
+                </select>
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label><i class="fas fa-robot"></i> Model:</label>
+                <select id="ai-provider"><option value="gemini">Google Gemini</option><option value="groq">Llama 3 (Fast)</option></select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button id="generate-btn" class="generate-btn" onclick="generateNotes()"><i class="fas fa-highlighter"></i> Create Notes</button>
+            <button id="word-btn" class="generate-btn word-btn" onclick="exportToDocx()" style="display: none;"><i class="fas fa-file-word"></i> Save .docx</button>
+        </div>
+        <div id="loading-box" class="loading-box"><div class="spinner"></div><div>Reading textbooks...</div></div>
+        <div id="output-section" class="output-section"></div>
+    </div>
+    <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
+    <script>
+        async function generateNotes() {
+            const topic = document.getElementById('topic-input').value;
+            const subject = document.getElementById('subject-input').value;
+            const provider = document.getElementById('ai-provider').value;
+            const outputBox = document.getElementById('output-section');
+            const loadingBox = document.getElementById('loading-box');
+            const btn = document.getElementById('generate-btn');
+            const wordBtn = document.getElementById('word-btn');
+            const token = localStorage.getItem('token');
+            if (!token) { alert("Login first!"); window.location.href = 'login.html'; return; }
+            if (!topic) { alert("Please enter a topic."); return; }
+            btn.disabled = true; wordBtn.style.display = 'none'; loadingBox.style.display = 'block'; outputBox.style.display = 'none';
+            try {
+                const res = await fetch('/generate-notes', { method: 'POST', headers: { 'Content-Type': 'application/json', 'auth-token': token }, body: JSON.stringify({ topic, subject, provider }) });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                outputBox.innerText = data.reply; outputBox.style.display = 'block'; wordBtn.style.display = 'flex';
+            } catch (err) { alert("Error: " + err.message); } finally { loadingBox.style.display = 'none'; btn.disabled = false; }
+        }
+        function exportToDocx() {
+            const topic = document.getElementById('topic-input').value;
+            const content = document.getElementById('output-section').innerText.replace(/\n/g, "<br><br>");
+            const htmlContent = `<!DOCTYPE html><html><head><style>body { font-family: 'Calibri'; } h1 { color: #059669; text-align: center; }</style></head><body><h1>Exam Suite Notes: ${topic}</h1><p>${content}</p></body></html>`;
+            const converted = htmlDocx.asBlob(htmlContent);
+            saveAs(converted, `Notes_${topic}.docx`);
+        }
+    </script>
+</body>
+</html>

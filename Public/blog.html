@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Blog Writer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            /* INDIGO GRADIENT THEME */
+            --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+            --primary-solid: #4338ca;
+            --secondary-color: #818cf8;
+            --light-bg: #eef2ff;
+            --white: #ffffff;
+            --text-dark: #333333;
+        }
+
+        body { font-family: 'Georgia', serif; background-color: var(--light-bg); color: var(--text-dark); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        
+        .header-container {
+            background: var(--primary-gradient);
+            color: var(--white); padding: 30px; text-align: center; position: relative; font-family: 'Segoe UI', sans-serif;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 4px 15px rgba(67, 56, 202, 0.3);
+        }
+        .back-link { position: absolute; top: 25px; left: 25px; color: white; text-decoration: none; font-weight: bold; opacity: 0.9; }
+        
+        /* NEW ICON */
+        .tool-icon {
+            width: 80px; height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: white;
+            margin-bottom: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .container { width: 100%; max-width: 900px; background: var(--white); padding: 50px; margin: 40px auto; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 25px; font-family: 'Segoe UI', sans-serif; }
+        label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--primary-solid); }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; background: #fafafa; }
+        input:focus, textarea:focus { border-color: var(--primary-solid); outline: none; background: white; }
+        
+        .generate-btn {
+            width: 100%; padding: 15px; 
+            background: var(--primary-gradient);
+            color: var(--white); border: none; border-radius: 5px; 
+            font-size: 1.2rem; font-weight: bold; cursor: pointer; 
+            transition: opacity 0.3s; font-family: 'Segoe UI', sans-serif;
+            box-shadow: 0 4px 10px rgba(67, 56, 202, 0.2);
+        }
+        .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(67, 56, 202, 0.3); }
+        .generate-btn:disabled { background: #9fa8da; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .output-section { display: none; margin-top: 40px; padding: 40px; background: white; border: 1px solid #ddd; line-height: 1.8; font-size: 1.1rem; color: #222; }
+        .loading-box { display: none; text-align: center; padding: 40px; margin-top: 30px; }
+        .pen-loader { font-size: 3rem; color: var(--primary-solid); animation: write 1s infinite alternate; }
+        @keyframes write { from { transform: rotate(0deg); } to { transform: rotate(15deg); } }
+        
+        .footer { background: #1e293b; color: var(--white); text-align: center; padding: 20px; margin-top: auto; font-family: 'Segoe UI', sans-serif; }
+
+        /* --- MOBILE PATCH --- */
+        @media (max-width: 768px) {
+            .container { padding: 20px; width: 95%; margin: 20px auto; }
+            div[style*="display: flex"] { flex-wrap: wrap; }
+            .input-group { min-width: 100%; margin-bottom: 15px; }
+            h1 { font-size: 1.5rem; }
+            .header-container { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Home</a>
+        <div class="tool-icon"><i class="fas fa-pen-nib"></i></div>
+        <h1>SEO Blog Writer</h1>
+        <div style="opacity: 0.9;">Create high-ranking content in seconds</div>
+    </header>
+    <div class="container">
+        <div class="input-group">
+            <label><i class="fas fa-heading"></i> Blog Topic / Title Idea:</label>
+            <input type="text" id="topic-input" placeholder="e.g. How to prepare for IBPS PO in 3 months">
+        </div>
+        <div class="input-group">
+            <label><i class="fas fa-tags"></i> Target Keywords (Comma separated):</label>
+            <input type="text" id="keywords-input" placeholder="e.g. study plan, mock tests, time management">
+        </div>
+        <div style="display: flex; gap: 20px;">
+            <div class="input-group" style="flex: 1;">
+                <label><i class="fas fa-sliders-h"></i> Tone:</label>
+                <select id="tone-input">
+                    <option value="Professional & Informative">Professional & Informative</option>
+                    <option value="Casual & Friendly">Casual & Friendly</option>
+                    <option value="Motivational">Motivational</option>
+                    <option value="Academic">Academic</option>
+                </select>
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label><i class="fas fa-robot"></i> AI Model:</label>
+                <select id="ai-provider"><option value="gemini">Google Gemini</option><option value="groq">Llama 3 (Groq)</option></select>
+            </div>
+        </div>
+        <button id="generate-btn" class="generate-btn" onclick="generateBlog()"><i class="fas fa-pen-nib"></i> Write Article</button>
+        <div id="loading-box" class="loading-box"><i class="fas fa-pen-fancy pen-loader"></i><div style="margin-top: 15px;">Drafting...</div></div>
+        <div id="output-section" class="output-section"></div>
+    </div>
+    <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
+    <script>
+        async function generateBlog() {
+            const topic = document.getElementById('topic-input').value;
+            const keywords = document.getElementById('keywords-input').value;
+            const tone = document.getElementById('tone-input').value;
+            const provider = document.getElementById('ai-provider').value;
+            const outputBox = document.getElementById('output-section');
+            const loadingBox = document.getElementById('loading-box');
+            const btn = document.getElementById('generate-btn');
+            const token = localStorage.getItem('token');
+            if (!token) { alert("Login first!"); window.location.href = 'login.html'; return; }
+            if (!topic) { alert("Please enter a topic."); return; }
+            btn.disabled = true; loadingBox.style.display = 'block'; outputBox.style.display = 'none';
+            try {
+                const res = await fetch('/generate-blog', { method: 'POST', headers: { 'Content-Type': 'application/json', 'auth-token': token }, body: JSON.stringify({ topic, keywords, tone, provider }) });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                outputBox.innerText = data.reply; outputBox.style.display = 'block'; outputBox.scrollIntoView({ behavior: 'smooth' });
+            } catch (err) { alert("Error: " + err.message); } finally { loadingBox.style.display = 'none'; btn.disabled = false; }
+        }
+    </script>
+</body>
+</html>
