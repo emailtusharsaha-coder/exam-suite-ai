@@ -84,22 +84,31 @@
         </div>
     </div>
 
-    <script>
+<script>
         const token = localStorage.getItem('token');
         if (!token) window.location.href = 'login.html';
+
+        // 1. Create a global list to hold the data safely
+        window.historyData = [];
 
         async function loadHistory() {
             try {
                 const res = await fetch('/api/auth/history', { headers: { 'auth-token': token } });
                 const history = await res.json();
                 
+                // 2. Save fetched data to our global list
+                window.historyData = history;
+
                 document.getElementById('item-count').innerText = `${history.length} items`;
                 const grid = document.getElementById('grid');
 
                 if (history.length > 0) {
-                    grid.innerHTML = ''; // Clear empty state
-                    history.forEach(item => {
+                    grid.innerHTML = ''; 
+                    // 3. Loop with 'index' (0, 1, 2...)
+                    history.forEach((item, index) => {
                         const date = new Date(item.createdAt).toLocaleDateString();
+                        
+                        // 4. THE FIX: Pass only the 'index' number to the function
                         const card = `
                             <div class="history-card">
                                 <div class="card-header">
@@ -108,7 +117,7 @@
                                 </div>
                                 <h3 class="card-title">${item.title}</h3>
                                 <div class="card-preview">${item.content.substring(0, 150)}...</div>
-                                <button class="view-btn" onclick='openModal(${JSON.stringify(item)})'>View Content</button>
+                                <button class="view-btn" onclick="openModal(${index})">View Content</button>
                             </div>
                         `;
                         grid.innerHTML += card;
@@ -117,24 +126,29 @@
             } catch (err) { console.error(err); }
         }
 
-        function openModal(item) {
+        function openModal(index) {
+            // 5. Look up the item using the index number
+            const item = window.historyData[index];
+            
             document.getElementById('modal-title').innerText = item.title;
             document.getElementById('modal-body').innerText = item.content;
             document.getElementById('modal').style.display = 'flex';
         }
+
         function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        
         function copyModalContent() {
             const text = document.getElementById('modal-body').innerText;
             navigator.clipboard.writeText(text);
             alert("Copied to clipboard!");
         }
 
-        // Close modal on outside click
         window.onclick = function(e) {
             if (e.target == document.getElementById('modal')) closeModal();
         }
 
         loadHistory();
     </script>
+    
 </body>
 </html>
