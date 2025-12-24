@@ -105,7 +105,15 @@
         </div>
         <button id="generate-btn" class="generate-btn" onclick="generateBlog()"><i class="fas fa-pen-nib"></i> Write Article</button>
         <div id="loading-box" class="loading-box"><i class="fas fa-pen-fancy pen-loader"></i><div style="margin-top: 15px;">Drafting...</div></div>
-        <div id="output-section" class="output-section"></div>
+        <div id="output-section" class="output-section" style="display:none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">
+        <h2 style="margin: 0; color: #4338ca;">Blog Draft:</h2>
+        <button onclick="saveToHistory()" style="background: #4338ca; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+            <i class="fas fa-save"></i> Save
+        </button>
+    </div>
+    <div id="blog-content"></div>
+</div>
     </div>
     <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
     <script>
@@ -125,9 +133,25 @@
                 const res = await fetch('/generate-blog', { method: 'POST', headers: { 'Content-Type': 'application/json', 'auth-token': token }, body: JSON.stringify({ topic, keywords, tone, provider }) });
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
-                outputBox.innerText = data.reply; outputBox.style.display = 'block'; outputBox.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('blog-content').innerText = data.reply; outputBox.style.display = 'block'; outputBox.scrollIntoView({ behavior: 'smooth' });
             } catch (err) { alert("Error: " + err.message); } finally { loadingBox.style.display = 'none'; btn.disabled = false; }
         }
+async function saveToHistory() {
+    const content = document.getElementById('blog-content').innerText;
+    if (!content) return alert("Nothing to save yet!");
+    const token = localStorage.getItem('token');
+    const topic = document.getElementById('topic-input').value;
+    
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ tool: 'Blog Writer', title: "Blog: " + topic, content: content })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
