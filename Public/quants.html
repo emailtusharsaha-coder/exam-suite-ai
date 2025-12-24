@@ -55,7 +55,12 @@
             <button id="generate-btn" class="generate-btn" onclick="generateQuant()"><i class="fas fa-cogs"></i> Generate New Question</button>
             <div id="loading-box" class="loading-box"><div class="spinner"></div><div id="loading-text">🧮 Crunching numbers...</div></div>
             <div id="output-section" class="output-section">
-                <div class="output-header"><h2 class="output-title">Generated Question:</h2></div>
+                <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 class="output-title" style="margin: 0;">Generated Question:</h2>
+    <button onclick="saveToHistory()" style="background: #2563eb; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-save"></i> Save
+    </button>
+</div>
                 <div id="ai-response" class="output-box"></div>
             </div>
         </div>
