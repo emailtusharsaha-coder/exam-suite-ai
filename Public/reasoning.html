@@ -55,8 +55,12 @@
             <button id="generate-btn" class="generate-btn" onclick="generateReasoning()"><i class="fas fa-cogs"></i> Generate Puzzle</button>
             <div id="loading-box" class="loading-box"><div class="spinner"></div><div>🧩 Thinking logically...</div></div>
             <div id="output-section" class="output-section">
-                <div class="output-header"><h2>Generated Puzzle:</h2></div>
-                <div id="ai-response" class="output-box"></div>
+                <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0;">Generated Puzzle:</h2>
+    <button onclick="saveToHistory()" style="background: #7c3aed; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-save"></i> Save
+    </button>
+</div>
             </div>
         </div>
     </main>
