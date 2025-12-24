@@ -76,5 +76,42 @@ router.post('/reset-stats', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed to reset stats" });
     }
 });
+// --- HISTORY ROUTES ---
 
+// 1. Save an item to history
+router.post('/save-history', authMiddleware, async (req, res) => {
+    try {
+        const { tool, title, content } = req.body;
+        
+        // Find user and push new item to history array
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { 
+                history: { 
+                    tool, 
+                    title: title || 'Untitled', 
+                    content,
+                    createdAt: new Date()
+                } 
+            }
+        });
+
+        res.json({ success: true, message: "Saved to history!" });
+    } catch (err) {
+        console.error("Save Error:", err);
+        res.status(500).json({ error: "Could not save history" });
+    }
+});
+
+// 2. Get user's history
+router.get('/history', authMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('history');
+        // Return history sorted by newest first
+        const sortedHistory = user.history.sort((a, b) => b.createdAt - a.createdAt);
+        res.json(sortedHistory);
+    } catch (err) {
+        console.error("Fetch History Error:", err);
+        res.status(500).json({ error: "Could not fetch history" });
+    }
+});
 module.exports = router;
