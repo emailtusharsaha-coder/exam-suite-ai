@@ -1,46 +1,56 @@
-const adminRoutes = require('./routes/admin');
 const express = require('express');
-const blogRoutes = require('./routes/blog');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const cors = require('cors');
-const notesRoutes = require('./routes/notes');
-const mongoose = require('mongoose'); // <--- Added this last time
-require('dotenv').config();
+const path = require('path'); // <--- CRITICAL IMPORT
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// MIDDLEWARE
 app.use(express.json());
-app.use(express.static('public'));
+app.use(cors());
 
-if (!process.env.GEMINI_API_KEY || !process.env.GROQ_API_KEY || !process.env.MONGO_URI) {
-    console.error("❌ ERROR: Missing Keys in .env file");
-    process.exit(1);
-}
+// SERVE STATIC FILES (CSS, HTML, JS)
+// This tells the server to look in the 'public' folder for files
+app.use(express.static(path.join(__dirname, 'public')));
 
-// ROUTE IMPORTS
+// CONNECT TO DB
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log("✅ Database Connected (MongoDB Atlas)"))
+    .catch(err => console.error("❌ DB Connection Error:", err));
+
+// IMPORT ROUTES
+const authRoutes = require('./routes/auth');
 const quantRoutes = require('./routes/quants');
 const englishRoutes = require('./routes/english');
-const gaRoutes = require('./routes/ga');
-const descriptiveRoutes = require('./routes/descriptive');
-const authRoutes = require('./routes/auth'); // <--- NEW
+const reasoningRoutes = require('./routes/reasoning');
+const gaRoutes = require('./routes/ga'); // Ensure this file exists
+const notesRoutes = require('./routes/notes');
+const blogRoutes = require('./routes/blog'); // Ensure this file exists
+const descriptiveRoutes = require('./routes/descriptive'); // Ensure this file exists
+const adminRoutes = require('./routes/admin');
 
 // USE ROUTES
-app.use('/generate-quant', quantRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/generate-quants', quantRoutes);
 app.use('/generate-english', englishRoutes);
+app.use('/generate-reasoning', reasoningRoutes);
 app.use('/generate-ga', gaRoutes);
-app.use('/check-descriptive', descriptiveRoutes);
-app.use('/api/auth', authRoutes); // <--- NEW
 app.use('/generate-notes', notesRoutes);
 app.use('/generate-blog', blogRoutes);
-app.use('/api/admin', adminRoutes);
+app.use('/generate-descriptive', descriptiveRoutes);
 
-// CONNECT DB & START
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("✅ Database Connected (MongoDB Atlas)");
-        app.listen(port, () => {
-            console.log(`✅ Modular Server running at http://localhost:${port}`);
-        });
-    })
-    .catch((err) => console.error("❌ Database Error:", err));
+// --- THE FIX: HANDLE HOMEPAGE & REFRESHES ---
+// This forces the server to serve 'index.html' when you visit the main URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// START SERVER
+app.listen(PORT, () => {
+    console.log(`✅ Modular Server running at http://localhost:${PORT}`);
+});
