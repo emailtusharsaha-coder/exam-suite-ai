@@ -95,8 +95,12 @@
             <button id="generate-btn" class="generate-btn" onclick="generateEnglish()"><i class="fas fa-pen-fancy"></i> Generate Question</button>
             <div id="loading-box" class="loading-box"><div class="spinner"></div><div>📖 Checking grammar...</div></div>
             <div id="output-section" class="output-section">
-                <div class="output-header"><h2>Generated Question:</h2></div>
-                <div id="ai-response" class="output-box"></div>
+                <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0;">Generated Question:</h2>
+    <button onclick="saveToHistory()" style="background: #e11d48; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-save"></i> Save
+    </button>
+</div>
             </div>
         </div>
     </main>
@@ -121,6 +125,23 @@
                 responseText.innerText = data.reply; outputSection.style.display = "block"; outputSection.scrollIntoView({ behavior: 'smooth' });
             } catch (error) { alert("Error: " + error.message); } finally { loadingBox.style.display = "none"; btn.disabled = false; }
         }
+        async function saveToHistory() {
+    const content = document.getElementById('ai-response').innerText;
+    if (!content) return alert("Nothing to save yet!");
+    const token = localStorage.getItem('token');
+    
+    let title = content.split('\n')[0].substring(0, 40) + "...";
+
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ tool: 'English', title: title, content: content })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
