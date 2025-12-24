@@ -5,160 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Grammar - Exam Suite</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e11d48; --primary-dark: #be123c; --bg-light: #fff1f2; --text-dark: #0f172a; --white: #ffffff; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background-color: #f8fafc; color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+        /* primary-color changed to Pink/Red for English theme */
+        :root { --primary-color: #e11d48; --light-bg: #f8fafc; --white: #ffffff; --text-dark: #1e293b; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--light-bg); color: var(--text-dark); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+        .header-container { background-color: var(--primary-color); color: var(--white); padding: 35px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .back-link { position: absolute; top: 25px; left: 25px; color: white; text-decoration: none; font-weight: bold; opacity: 0.9; }
         
-        /* NAVBAR */
-        .navbar { background: rgba(255,255,255,0.95); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
-        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .nav-links a { margin-left: 20px; text-decoration: none; color: #64748b; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--primary); }
+        /* ICON STYLE */
+        .tool-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.4); }
 
-        /* HERO SECTION */
-        .hero { background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); padding: 60px 20px; text-align: center; border-bottom: 1px solid #fecdd3; }
-        .hero h1 { font-size: 2.5rem; font-weight: 800; color: var(--primary-dark); margin: 0 0 10px 0; letter-spacing: -0.02em; }
-        .hero p { color: #881337; font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
-
-        /* MAIN CONTAINER */
-        .container { max-width: 800px; margin: -40px auto 40px; padding: 0 20px; position: relative; z-index: 10; flex: 1; }
-        
-        /* TOOL CARD */
-        .tool-card { background: var(--white); padding: 35px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
-        
-        /* INPUTS */
-        label { display: block; font-weight: 700; margin-bottom: 8px; color: #334155; font-size: 0.95rem; }
-        textarea, select { width: 100%; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 1rem; margin-bottom: 25px; box-sizing: border-box; transition: all 0.2s; background: #f8fafc; }
-        textarea:focus, select:focus { border-color: var(--primary); outline: none; background: white; box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1); }
-        
-        /* BUTTON */
-        .btn-generate { width: 100%; background: var(--primary); color: white; padding: 16px; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; gap: 10px; box-shadow: 0 4px 6px -1px rgba(225, 29, 72, 0.2); }
-        .btn-generate:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.3); }
-        
-        /* LOADING */
-        .loading { display: none; text-align: center; margin-top: 30px; color: var(--primary); font-weight: 600; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        .container { width: 100%; max-width: 900px; background: var(--white); padding: 45px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin: 40px auto; }
+        .input-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 700; color: var(--primary-color); font-size: 1.1rem; }
+        textarea, select { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; box-sizing: border-box; font-family: inherit; resize: vertical; }
+        textarea:focus, select:focus { border-color: var(--primary-color); outline: none; }
+        .generate-btn { width: 100%; padding: 18px; background-color: var(--primary-color); color: var(--white); border: none; border-radius: 10px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .generate-btn:hover { background-color: #be123c; transform: translateY(-2px); }
+        .generate-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .loading-box { display: none; text-align: center; padding: 40px; margin-top: 30px; background: #fdfdff; border-radius: 12px; border: 2px dashed var(--primary-color); }
+        .spinner { width: 50px; height: 50px; border: 5px solid #e0e0e0; border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .output-section { margin-top: 40px; border-top: 2px solid #f0f0f0; padding-top: 30px; display: none; }
+        .output-box { background-color: #fcfcff; padding: 30px; border-left: 6px solid var(--primary-color); border-radius: 8px; white-space: pre-wrap; font-size: 1.05rem; line-height: 1.7; }
+        .footer { background: var(--text-dark); color: var(--white); text-align: center; padding: 25px; margin-top: auto; }
 
-        /* OUTPUT SECTION */
-        .output-section { margin-top: 30px; background: #fff1f2; padding: 0; border-radius: 12px; border: 1px solid #fecdd3; display: none; overflow: hidden; }
-        .output-header { background: rgba(255,255,255,0.5); padding: 15px 25px; border-bottom: 1px solid #fecdd3; display: flex; justify-content: space-between; align-items: center; }
-        .output-title { font-size: 1.1rem; font-weight: 700; color: var(--primary-dark); margin: 0; display: flex; align-items: center; gap: 8px; }
-        .output-content { padding: 25px; white-space: pre-wrap; line-height: 1.8; color: #334155; font-size: 1.05rem; }
-
-        /* SAVE BUTTON */
-        .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-save:hover { background: var(--primary-dark); }
-
-        /* FOOTER */
-        .footer { background: white; padding: 30px 5%; text-align: center; border-top: 1px solid #e2e8f0; margin-top: auto; color: #64748b; font-size: 0.9rem; }
-        .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
-
-        @media (max-width: 600px) { .hero { padding: 40px 20px 60px; } .container { margin-top: -30px; } .tool-card { padding: 20px; } }
+        @media (max-width: 768px) { .container { width: 95%; padding: 20px; margin: 20px auto; } h1 { font-size: 1.8rem; } .header-container { padding: 20px; } }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="index.html" class="logo"><i class="fas fa-brain"></i> Exam Suite</a>
-        <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="history.html">History</a>
-            <a href="profile.html"><i class="fas fa-user-circle"></i></a>
-        </div>
-    </nav>
-
-    <header class="hero">
+    <header class="header-container">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Home</a>
+        <div class="tool-icon"><i class="fas fa-book-open"></i></div>
         <h1>English Grammar Generator</h1>
-        <p>Master error spotting and sentence correction with AI-generated exam scenarios.</p>
     </header>
-
-    <div class="container">
-        <div class="tool-card">
-            <label><i class="fas fa-quote-left"></i> 1. Paste Sample Question/Sentence:</label>
-            <textarea id="sample-text" rows="3" placeholder="e.g., The cattle is grazing in the field."></textarea>
-
-            <label><i class="fas fa-book"></i> 2. Paste Logic/Rule (Optional):</label>
-            <textarea id="sample-rule" rows="2" placeholder="e.g., 'Cattle' is plural, so use 'are'."></textarea>
-
-            <label><i class="fas fa-robot"></i> Choose AI Model:</label>
-            <select id="model-select">
-                <option value="groq">Llama 3 via Groq (Fast)</option>
-                <option value="gemini">Google Gemini (Smart)</option>
-            </select>
-
-            <button class="btn-generate" onclick="generateEnglish()">
-                <i class="fas fa-wand-magic-sparkles"></i> Generate Question
-            </button>
-
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <span>Analyzing grammar rules...</span>
+    <main class="main-content">
+        <div class="container">
+            <div class="input-group">
+                <label for="sample-text"><i class="fas fa-quote-left"></i> 1. Paste Sample Question/Sentence:</label>
+                <textarea id="sample-text" placeholder="e.g. The cattle is grazing in the field."></textarea>
             </div>
-
+            <div class="input-group">
+                <label for="sample-rule"><i class="fas fa-lightbulb"></i> 2. Paste Logic/Rule (Optional):</label>
+                <textarea id="sample-rule" placeholder="e.g. 'Cattle' is plural, so use 'are'."></textarea>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-robot"></i> Choose AI Model:</label>
+                <select id="ai-provider"><option value="gemini">Google Gemini (Default)</option><option value="groq">Llama 3 via Groq (Fast)</option></select>
+            </div>
+            <button id="generate-btn" class="generate-btn" onclick="generateEnglish()"><i class="fas fa-wand-magic-sparkles"></i> Generate Question</button>
+            <div id="loading-box" class="loading-box"><div class="spinner"></div><div id="loading-text">📖 Checking grammar...</div></div>
             <div id="output-section" class="output-section">
-                <div class="output-header">
-                    <h2 class="output-title"><i class="fas fa-check-circle"></i> Generated Question:</h2>
-                    <button class="btn-save" onclick="saveToHistory()">
+                <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 class="output-title" style="margin: 0; color: var(--primary-color);">Generated Question:</h2>
+                    <button onclick="saveToHistory()" style="background: var(--primary-color); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
                         <i class="fas fa-save"></i> Save
                     </button>
                 </div>
-                <div id="ai-response" class="output-content"></div>
+                <div id="ai-response" class="output-box"></div>
             </div>
         </div>
-    </div>
-
-    <footer class="footer">
-        <p>© 2025 Exam Suite AI. Built by Tushar.</p>
-        <p>Powered by <a href="#">Gemini</a> & <a href="#">Llama 3</a></p>
-    </footer>
-
+    </main>
+    <footer class="footer">Made with love <i class="fas fa-heart"></i> in India by Tushar Saha</footer>
     <script>
-        const token = localStorage.getItem('token');
-        if (!token) window.location.href = 'login.html';
-
         async function generateEnglish() {
-            const sampleQuestion = document.getElementById('sample-text').value;
-            const sampleLogic = document.getElementById('sample-rule').value;
-            const provider = document.getElementById('model-select').value;
-            const outputDiv = document.getElementById('output-section');
-            const responseDiv = document.getElementById('ai-response');
-            const loading = document.getElementById('loading');
-
-            if (!sampleQuestion) return alert("Please enter a sentence or sample question.");
-
-            loading.style.display = 'block';
-            outputDiv.style.display = 'none';
-            responseDiv.innerText = '';
-
+            const question = document.getElementById('sample-text').value;
+            const rule = document.getElementById('sample-rule').value;
+            const provider = document.getElementById('ai-provider').value;
+            const btn = document.getElementById('generate-btn');
+            const loadingBox = document.getElementById('loading-box');
+            const outputSection = document.getElementById('output-section');
+            const responseText = document.getElementById('ai-response');
+            const token = localStorage.getItem('token');
+            
+            if (!token) { alert("Please login first!"); window.location.href = 'login.html'; return; }
+            if (!question) { alert("Please provide a sample sentence."); return; }
+            
+            btn.disabled = true; loadingBox.style.display = "block"; outputSection.style.display = "none";
+            
             try {
-                const res = await fetch('/generate-english', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'auth-token': token },
-                    body: JSON.stringify({ sampleQuestion, sampleLogic, provider })
+                const response = await fetch('/generate-english', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json', 'auth-token': token }, 
+                    body: JSON.stringify({ sampleQuestion: question, sampleLogic: rule, provider: provider }) 
                 });
-
-                const data = await res.json();
-                loading.style.display = 'none';
-
-                if (data.reply) {
-                    outputDiv.style.display = 'block';
-                    responseDiv.innerText = data.reply;
-                } else {
-                    alert("Error: " + (data.error || "Failed to generate"));
-                }
-            } catch (err) {
-                loading.style.display = 'none';
-                console.error(err);
-                alert("Something went wrong!");
-            }
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                responseText.innerText = data.reply; 
+                outputSection.style.display = "block"; 
+                outputSection.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) { alert("Error: " + error.message); } 
+            finally { loadingBox.style.display = "none"; btn.disabled = false; }
         }
 
         async function saveToHistory() {
             const content = document.getElementById('ai-response').innerText;
             if (!content) return alert("Nothing to save yet!");
-            
-            let title = content.split('\n')[0].substring(0, 40) + "...";
+
+            const token = localStorage.getItem('token');
+            let title = content.substring(0, 30).split('\n')[0] + "..."; 
 
             try {
                 const res = await fetch('/api/auth/save-history', {
