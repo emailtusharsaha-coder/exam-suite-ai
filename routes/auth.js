@@ -114,4 +114,15 @@ router.get('/history', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Could not fetch history" });
     }
 });
+// --- GET USER DETAILS ---
+router.get('/get-user', authMiddleware, async (req, res) => {
+    try {
+        // Find user by ID, but DO NOT send the password back (security)
+        const user = await User.findById(req.user.id).select('-password');
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server Error" });
+    }
+});
 module.exports = router;
