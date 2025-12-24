@@ -5,179 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - Exam Suite</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-blue: #0056b3;
-            --secondary-orange: #ff6b35;
-            --light-bg: #f4f7f6;
-            --white: #ffffff;
-        }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: var(--light-bg);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            padding: 40px;
-        }
-        
-        .profile-container {
-            background: var(--white);
-            width: 100%;
-            max-width: 800px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            padding-bottom: 30px; /* Add padding for bottom buttons */
-        }
+        :root { --primary: #2563eb; --bg-light: #f1f5f9; --text-dark: #1e293b; --white: #ffffff; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER SECTION */
-        .profile-header {
-            background: var(--primary-blue);
-            color: white;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-        }
-        .back-btn {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .avatar {
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: var(--secondary-orange);
-            border: 4px solid var(--secondary-orange);
-        }
+        /* NAVBAR */
+        .navbar { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-links a { margin-left: 20px; text-decoration: none; color: #64748b; font-weight: 600; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover { color: var(--primary); }
 
-        .role-badge {
-            background: var(--secondary-orange);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-            margin-top: 10px;
-            display: inline-block;
-        }
+        /* PROFILE CONTAINER */
+        .container { max-width: 600px; margin: 60px auto; padding: 0 20px; flex: 1; }
+
+        /* PROFILE CARD */
+        .profile-card { background: white; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); overflow: hidden; text-align: center; }
+        
+        .card-header { background: linear-gradient(135deg, #2563eb, #1d4ed8); padding: 40px 20px; color: white; }
+        .avatar { width: 100px; height: 100px; background: white; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: var(--primary); border: 4px solid rgba(255,255,255,0.3); }
+        .user-name { font-size: 1.8rem; font-weight: 800; margin: 0; }
+        .user-email { font-size: 0.9rem; opacity: 0.9; margin-top: 5px; }
 
         /* STATS GRID */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 40px;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+        .stat-box { background: white; padding: 25px; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: var(--primary); display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .stat-card {
-            background: #f8fbff;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            border-bottom: 4px solid var(--primary-blue);
-        }
-        .stat-card i {
-            font-size: 2rem;
-            color: var(--primary-blue);
-            margin-bottom: 10px;
-        }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #333;
-            margin: 10px 0;
-        }
-        .stat-label { color: #666; font-size: 0.9rem; }
+        /* ACTIONS */
+        .card-body { padding: 30px; }
+        .btn { display: block; width: 100%; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: 700; margin-bottom: 15px; transition: transform 0.2s; border: none; cursor: pointer; font-size: 1rem; }
+        
+        .btn-history { background: #eff6ff; color: var(--primary); border: 2px solid #bfdbfe; }
+        .btn-history:hover { background: #dbeafe; }
 
-        /* BUTTONS */
-        .logout-btn {
-            display: block;
-            padding: 12px;
-            color: white;
-            text-align: center;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1rem;
-            background: #dc3545; /* Red for Logout */
-            transition: opacity 0.3s;
-        }
-        .logout-btn:hover { opacity: 0.9; }
+        .btn-logout { background: #fee2e2; color: #dc2626; border: 2px solid #fecaca; }
+        .btn-logout:hover { background: #fecaca; }
 
-        .reset-btn {
-            background: #6c757d; /* Grey for Reset */
-        }
-
+        /* FOOTER */
+        .footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #94a3b8; }
     </style>
 </head>
 <body>
 
-    <div class="profile-container">
-        <div class="profile-header">
-            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <h1 id="user-name">Loading...</h1>
-            <div id="user-email">...</div>
-            <div id="user-role" class="role-badge">Student</div>
+    <nav class="navbar">
+        <a href="index.html" class="logo"><i class="fas fa-brain"></i> Exam Suite</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="history.html">History</a>
         </div>
+    </nav>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-file-alt"></i>
-                <div class="stat-number" id="stat-questions">0</div>
-                <div class="stat-label">Questions Generated</div>
+    <div class="container">
+        <div class="profile-card">
+            <div class="card-header">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <h1 class="user-name" id="display-name">Loading...</h1>
+                <p class="user-email" id="display-email">...</p>
             </div>
-            <div class="stat-card">
-                <i class="fas fa-coins"></i>
-                <div class="stat-number" id="stat-tokens">0</div>
-                <div class="stat-label">Tokens Used (Cost)</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-wallet"></i>
-                <div class="stat-number">Free</div>
-                <div class="stat-label">Plan Type</div>
-            </div>
-        </div>
 
-        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 250px; margin: 0 auto;">
-            
-            <button class="logout-btn reset-btn" onclick="resetStats()">
-                <i class="fas fa-redo"></i> Reset My Stats
-            </button>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-number" id="stat-questions">0</span>
+                    <span class="stat-label">Questions Created</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="stat-tokens">0</span>
+                    <span class="stat-label">AI Credits Used</span>
+                </div>
+            </div>
 
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            
+            <div class="card-body">
+                <a href="history.html" class="btn btn-history">
+                    <i class="fas fa-history"></i> View My Library
+                </a>
+                <button onclick="logout()" class="btn btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
         </div>
     </div>
 
+    <footer class="footer">
+        Member since 2025 • Exam Suite AI
+    </footer>
+
     <script>
-        // 1. GATEKEEPER CHECK
         const token = localStorage.getItem('token');
         if (!token) window.location.href = 'login.html';
 
-        // 2. FETCH DATA
         async function loadProfile() {
             try {
-                const res = await fetch('/api/auth/profile', {
+                const res = await fetch('/api/auth/get-user', {
                     headers: { 'auth-token': token }
                 });
                 
@@ -185,48 +105,29 @@
 
                 const user = await res.json();
 
-                // 3. FILL THE UI
-                document.getElementById('user-name').innerText = user.username;
-                document.getElementById('user-email').innerText = user.email;
-                document.getElementById('user-role').innerText = user.role.toUpperCase();
-                
-                // If stats exist, show them (or default to 0)
-                const stats = user.stats || { questionsGenerated: 0, tokensUsed: 0 };
-                document.getElementById('stat-questions').innerText = stats.questionsGenerated;
-                document.getElementById('stat-tokens').innerText = stats.tokensUsed;
+                // 1. Populate Name & Email
+                document.getElementById('display-name').innerText = user.username;
+                document.getElementById('display-email').innerText = user.email;
+
+                // 2. Populate Stats (Handle if stats are undefined/zero)
+                const qCount = user.stats ? user.stats.questionsGenerated : 0;
+                const tCount = user.stats ? user.stats.tokensUsed : 0;
+
+                document.getElementById('stat-questions').innerText = qCount;
+                document.getElementById('stat-tokens').innerText = tCount;
 
             } catch (err) {
+                console.error(err);
                 alert("Session expired. Please login again.");
                 logout();
             }
         }
 
-        // 3. RESET STATS FUNCTION
-        async function resetStats() {
-            if(!confirm("Are you sure you want to reset your usage stats to zero?")) return;
-
-            const res = await fetch('/api/auth/reset-stats', {
-                method: 'POST',
-                headers: { 'auth-token': token }
-            });
-
-            if(res.ok) {
-                alert("Stats reset!");
-                location.reload(); // Refresh page to see 0
-            } else {
-                alert("Failed to reset.");
-            }
-        }
-
-        // 4. LOGOUT FUNCTION
         function logout() {
             localStorage.removeItem('token');
-            localStorage.removeItem('username');
-            localStorage.removeItem('role');
             window.location.href = 'login.html';
         }
 
-        // Run on load
         loadProfile();
     </script>
 </body>
