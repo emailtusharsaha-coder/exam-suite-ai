@@ -88,7 +88,7 @@
         const token = localStorage.getItem('token');
         if (!token) window.location.href = 'login.html';
 
-        // 1. Create a global list to hold the data safely
+        // Global variable to store data
         window.historyData = [];
 
         async function loadHistory() {
@@ -96,20 +96,20 @@
                 const res = await fetch('/api/auth/history', { headers: { 'auth-token': token } });
                 const history = await res.json();
                 
-                // 2. Save fetched data to our global list
+                // Store fetched data
                 window.historyData = history;
 
                 document.getElementById('item-count').innerText = `${history.length} items`;
                 const grid = document.getElementById('grid');
 
                 if (history.length > 0) {
-                    grid.innerHTML = ''; 
-                    // 3. Loop with 'index' (0, 1, 2...)
+                    // Build the big HTML string first (Faster & Safer)
+                    let allCards = '';
+                    
                     history.forEach((item, index) => {
                         const date = new Date(item.createdAt).toLocaleDateString();
-                        
-                        // 4. THE FIX: Pass only the 'index' number to the function
-                        const card = `
+                        // Using explicit window.openModal call
+                        allCards += `
                             <div class="history-card">
                                 <div class="card-header">
                                     <span class="tool-badge">${item.tool || 'General'}</span>
@@ -117,34 +117,40 @@
                                 </div>
                                 <h3 class="card-title">${item.title}</h3>
                                 <div class="card-preview">${item.content.substring(0, 150)}...</div>
-                                <button class="view-btn" onclick="openModal(${index})">View Content</button>
+                                <button class="view-btn" type="button" onclick="window.openModal(${index})">View Content</button>
                             </div>
                         `;
-                        grid.innerHTML += card;
                     });
+                    
+                    grid.innerHTML = allCards;
                 }
             } catch (err) { console.error(err); }
         }
 
-        function openModal(index) {
-            // 5. Look up the item using the index number
+        // Explicitly attach to window to ensure HTML can see it
+        window.openModal = function(index) {
+            console.log("Opening item index:", index); // Debugging line
             const item = window.historyData[index];
-            
+            if(!item) return;
+
             document.getElementById('modal-title').innerText = item.title;
             document.getElementById('modal-body').innerText = item.content;
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        window.closeModal = function() { 
+            document.getElementById('modal').style.display = 'none'; 
+        }
         
-        function copyModalContent() {
+        window.copyModalContent = function() {
             const text = document.getElementById('modal-body').innerText;
             navigator.clipboard.writeText(text);
             alert("Copied to clipboard!");
         }
 
+        // Close on outside click
         window.onclick = function(e) {
-            if (e.target == document.getElementById('modal')) closeModal();
+            if (e.target == document.getElementById('modal')) window.closeModal();
         }
 
         loadHistory();
