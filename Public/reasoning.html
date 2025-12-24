@@ -85,6 +85,24 @@
                 responseText.innerText = data.reply; outputSection.style.display = "block"; outputSection.scrollIntoView({ behavior: 'smooth' });
             } catch (error) { alert("Error: " + error.message); } finally { loadingBox.style.display = "none"; btn.disabled = false; }
         }
+    async function saveToHistory() {
+    const content = document.getElementById('ai-response').innerText;
+    if (!content) return alert("Nothing to save yet!");
+    const token = localStorage.getItem('token');
+    
+    // Create a title from the first line
+    let title = content.split('\n')[0].substring(0, 40) + "...";
+
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ tool: 'Reasoning', title: title, content: content })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
