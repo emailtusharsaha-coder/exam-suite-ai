@@ -55,8 +55,12 @@
             <button id="generate-btn" class="generate-btn" onclick="generateDescriptive()"><i class="fas fa-check-double"></i> Grade My Essay</button>
             <div id="loading-box" class="loading-box"><div class="spinner"></div><div>📝 Grading your work...</div></div>
             <div id="output-section" class="output-section">
-                <div class="output-header"><h2>Feedback & Score:</h2></div>
-                <div id="ai-response" class="output-box"></div>
+                <div class="output-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <h2 style="margin: 0;">Feedback & Score:</h2>
+    <button onclick="saveToHistory()" style="background: #d946ef; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-save"></i> Save
+    </button>
+</div>
             </div>
         </div>
     </main>
@@ -81,6 +85,25 @@
                 responseText.innerText = data.reply; outputSection.style.display = "block"; outputSection.scrollIntoView({ behavior: 'smooth' });
             } catch (error) { alert("Error: " + error.message); } finally { loadingBox.style.display = "none"; btn.disabled = false; }
         }
+    async function saveToHistory() {
+    const content = document.getElementById('ai-response').innerText;
+    if (!content) return alert("Nothing to save yet!");
+    const token = localStorage.getItem('token');
+    
+    // Use the user's question as the title if possible, else generic
+    const qInput = document.getElementById('question-input').value;
+    let title = qInput ? "Grade: " + qInput.substring(0, 30) : "Essay Feedback";
+
+    try {
+        const res = await fetch('/api/auth/save-history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'auth-token': token },
+            body: JSON.stringify({ tool: 'Descriptive', title: title, content: content })
+        });
+        const data = await res.json();
+        if(data.success) alert("Saved to History! 💾");
+    } catch(err) { console.error(err); }
+}
     </script>
 </body>
 </html>
