@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My History - Exam Suite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --bg-light: #f8fafc; --white: #ffffff; --text-dark: #1e293b; --text-gray: #64748b; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        
+        /* NAVBAR */
+        .navbar { background: rgba(255,255,255,0.95); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        
+        /* CONTAINER */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-size: 2rem; font-weight: 800; margin: 0; }
+        
+        /* HISTORY GRID */
+        .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .history-card { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; display: flex; flex-direction: column; }
+        .history-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-color: #bfdbfe; }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
+        .tool-badge { font-size: 0.75rem; font-weight: bold; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: #eff6ff; color: var(--primary); }
+        .date-text { font-size: 0.8rem; color: var(--text-gray); }
+        
+        .card-title { font-size: 1.1rem; font-weight: 700; margin: 0 0 10px 0; color: var(--text-dark); }
+        .card-preview { font-size: 0.9rem; color: var(--text-gray); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 20px; flex-grow: 1; }
+        
+        .view-btn { background: var(--bg-light); color: var(--primary); border: 1px solid #bfdbfe; padding: 10px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .view-btn:hover { background: var(--primary); color: white; }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .modal-box { background: white; width: 90%; max-width: 600px; max-height: 80vh; border-radius: 12px; padding: 30px; position: relative; display: flex; flex-direction: column; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+        .modal-content { overflow-y: auto; white-space: pre-wrap; line-height: 1.6; color: #333; flex-grow: 1; padding-right: 10px; }
+        .copy-btn { margin-top: 15px; background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 60px; grid-column: 1 / -1; color: var(--text-gray); }
+        .empty-icon { font-size: 3rem; margin-bottom: 20px; opacity: 0.5; }
+
+        @media (max-width: 768px) { .container { width: 95%; margin: 20px auto; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo"><i class="fas fa-brain"></i> Exam Suite</a>
+        <div style="display: flex; gap: 15px;">
+            <a href="index.html" style="text-decoration: none; color: var(--text-gray); font-weight: 600;">Home</a>
+            <a href="#" style="text-decoration: none; color: var(--primary); font-weight: 600;">History</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Your Library</h1>
+            <span id="item-count" style="background: #e2e8f0; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">0 items</span>
+        </div>
+
+        <div id="grid" class="history-grid">
+            <div class="empty-state">
+                <i class="fas fa-folder-open empty-icon"></i>
+                <h3>No history found</h3>
+                <p>Generate some content to see it saved here!</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title" style="margin: 0;">Content Details</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-content"></div>
+            <button class="copy-btn" onclick="copyModalContent()"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+
+        async function loadHistory() {
+            try {
+                const res = await fetch('/api/auth/history', { headers: { 'auth-token': token } });
+                const history = await res.json();
+                
+                document.getElementById('item-count').innerText = `${history.length} items`;
+                const grid = document.getElementById('grid');
+
+                if (history.length > 0) {
+                    grid.innerHTML = ''; // Clear empty state
+                    history.forEach(item => {
+                        const date = new Date(item.createdAt).toLocaleDateString();
+                        const card = `
+                            <div class="history-card">
+                                <div class="card-header">
+                                    <span class="tool-badge">${item.tool || 'General'}</span>
+                                    <span class="date-text">${date}</span>
+                                </div>
+                                <h3 class="card-title">${item.title}</h3>
+                                <div class="card-preview">${item.content.substring(0, 150)}...</div>
+                                <button class="view-btn" onclick='openModal(${JSON.stringify(item)})'>View Content</button>
+                            </div>
+                        `;
+                        grid.innerHTML += card;
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function openModal(item) {
+            document.getElementById('modal-title').innerText = item.title;
+            document.getElementById('modal-body').innerText = item.content;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function copyModalContent() {
+            const text = document.getElementById('modal-body').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Copied to clipboard!");
+        }
+
+        // Close modal on outside click
+        window.onclick = function(e) {
+            if (e.target == document.getElementById('modal')) closeModal();
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
